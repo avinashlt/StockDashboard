@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Paper, Typography, Box, Button, Avatar, IconButton, Divider } from '@mui/material';
+import { Grid, Paper, Typography, Box, Button, Avatar, Divider } from '@mui/material';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
@@ -7,6 +7,7 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import UpgradeIcon from '@mui/icons-material/Upgrade';
 import { styled } from '@mui/system';
 import { green, blue, red, yellow, grey } from '@mui/material/colors';
+import { useStocks } from '../hooks/useStocks'; // Import the useStocks hook
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(2),
@@ -22,14 +23,21 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 }));
 
 const StocksInfo = () => {
+  const { data: stocks, isLoading, error } = useStocks();
+
+  if (isLoading) {
+    return <Typography>Loading...</Typography>;
+  }
+
+  if (error) {
+    return <Typography>Error loading data</Typography>;
+  }
+
   return (
     <Box sx={{ flexGrow: 1, padding: 2, backgroundColor: grey[200], minHeight: '100vh' }}>
-      {/* Container Grid */}
       <Grid container spacing={2}>
-        {/* Left Section - 4 columns */}
         <Grid item xs={4}>
           <StyledPaper>
-            {/* Sidebar */}
             <Box sx={{ mt: 2, mb: 4 }}>
               <Typography variant="h5" sx={{ fontWeight: 'bold', color: blue[600] }}>
                 <AccountBalanceWalletIcon fontSize="large" /> Navigation
@@ -62,16 +70,13 @@ const StocksInfo = () => {
           </StyledPaper>
         </Grid>
 
-        {/* Right Section - 8 columns */}
         <Grid item xs={8}>
           <StyledPaper>
-            {/* Header and Overview Section */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
               <Typography variant="h6" sx={{ color: blue[800], fontWeight: 'bold' }}>Overview</Typography>
               <Button variant="contained" color="secondary">View All Details</Button>
             </Box>
             
-            {/* Widgets */}
             <Grid container spacing={2}>
               <Grid item xs={4}>
                 <StyledPaper>
@@ -93,37 +98,19 @@ const StocksInfo = () => {
               </Grid>
             </Grid>
 
-            {/* Stock Market */}
             <Box sx={{ mt: 4 }}>
               <Typography variant="h6" sx={{ fontWeight: 'bold', color: blue[800] }}>Stock Market</Typography>
               <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <StyledPaper>
-                    <Typography>📈 Netflix - $5690.00</Typography>
-                    <Typography>📉 Microsoft - $2690.00</Typography>
-                    <Typography>📈 Tesla - $7690.00</Typography>
+                    {stocks?.map((stock: { id: number, name: string, price: number, change: string }) => (
+                      <Typography key={stock.id}>
+                        {stock.change === 'up' ? '📈' : '📉'} {stock.name} - ${stock.price.toFixed(2)}
+                      </Typography>
+                    ))}
                   </StyledPaper>
                 </Grid>
               </Grid>
-            </Box>
-
-            {/* Cash Flow */}
-            <Box sx={{ mt: 4 }}>
-              <Typography variant="h6" sx={{ fontWeight: 'bold', color: green[800] }}>Cash Flow</Typography>
-              <StyledPaper>
-                {/* Placeholder for Chart */}
-                <Typography>📊 Chart Placeholder</Typography>
-              </StyledPaper>
-            </Box>
-
-            {/* Latest Transactions */}
-            <Box sx={{ mt: 4 }}>
-              <Typography variant="h6" sx={{ fontWeight: 'bold', color: blue[800] }}>Latest Transactions</Typography>
-              <StyledPaper>
-                <Typography>Apple Inc. - $9789.00 📈</Typography>
-                <Typography>Amazon - $6789.00 📈</Typography>
-                <Typography>IBM - $1673.00 📉</Typography>
-              </StyledPaper>
             </Box>
           </StyledPaper>
         </Grid>
